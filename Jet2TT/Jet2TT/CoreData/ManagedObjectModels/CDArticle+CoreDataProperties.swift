@@ -17,7 +17,7 @@ extension CDArticle {
         return NSFetchRequest<CDArticle>(entityName: "CDArticle")
     }
 
-    @NSManaged public var id: String?
+    @NSManaged public var id: Int32
     @NSManaged public var createdAt: String?
     @NSManaged public var content: String?
     @NSManaged public var comments: Int32

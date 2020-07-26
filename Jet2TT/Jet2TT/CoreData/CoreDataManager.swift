@@ -36,7 +36,7 @@ final class CoreDataManager {
     private func createEntityFrom(data: Article) -> CDArticle? {
             let article = CDArticle(context: moc)
 
-            article.id = data.id
+            article.id = Int32(data.id)!
             article.comments = data.comments
             article.likes = data.likes
             article.content = data.content

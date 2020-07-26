@@ -4,7 +4,7 @@
         <attribute name="comments" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="content" optional="YES" attributeType="String"/>
         <attribute name="createdAt" optional="YES" attributeType="String"/>
-        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="likes" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="toMedia" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDMedia" inverseName="toArticle" inverseEntity="CDMedia"/>
         <relationship name="toUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDUser" inverseName="toArticle" inverseEntity="CDUser"/>

@@ -24,13 +24,25 @@ class ArticleListViewController: UIViewController, UIUpdaterProtocol {
 
         articleTableView.dataSource = self
         articleTableView.delegate = self
+
+        articleTableView.rowHeight = UITableView.automaticDimension
+        articleTableView.estimatedRowHeight = 600
+
         viewModel.fetchedResultsController.delegate = self
         articleTableView.register(ArticleCell.self, forCellReuseIdentifier: "ArticleCellID")
+        articleTableView.register(LoadingCell.self, forCellReuseIdentifier: "LoadingCellID")
     }
 
     func updateUI() {
         viewModel.getDataFromDB()
         articleTableView.reloadData()
+    }
+
+    func updateOfflineUI(error: Error) {
+        viewModel.getDataFromDB()
+        articleTableView.reloadData()
+
+        showMessage(title: "Offline", message: error.localizedDescription, actionTitle: NSLocalizedString("OK", comment: ""))
     }
 }
 
@@ -44,30 +56,16 @@ extension ArticleListViewController: NSFetchedResultsControllerDelegate {
         switch (type) {
         case .insert:
             if let indexPath = newIndexPath {
-                articleTableView.insertRows(at: [indexPath], with: .middle)
+                articleTableView.insertRows(at: [IndexPath(row: indexPath.section, section: 0)], with: .none)
             }
-            break
         case .delete:
             if let indexPath = indexPath {
-                articleTableView.deleteRows(at: [indexPath], with: .fade)
+                articleTableView.deleteRows(at: [IndexPath(row: indexPath.section, section: 0)], with: .none)
             }
-            break
         default:
             break
         }
 
-    }
-
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-
-        switch type {
-        case .insert:
-            articleTableView.insertSections(IndexSet(integer: sectionIndex), with: .middle)
-        case .delete:
-            articleTableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
-        default:
-            break;
-        }
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
@@ -78,36 +76,50 @@ extension ArticleListViewController: NSFetchedResultsControllerDelegate {
 extension ArticleListViewController: UITableViewDataSource {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1 //viewModel.sectionCount()
+        return 2
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.rowsCount(for: section)
+        if section == 0 {
+            return viewModel.sectionCount()
+        } else if section == 1 {
+            //Return the Loading cell
+            return 1
+        } else {
+            //Return nothing
+            return 0
+        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ArticleCellID", for: indexPath) as! ArticleCell
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "ArticleCellID", for: indexPath) as! ArticleCell
 
-        guard let article = viewModel.itemAt(indexPath: indexPath) else{
+            guard let articleCellVM = viewModel.itemAt(indexPath: indexPath) else {
+                return cell
+            }
+
+            cell.update(with: articleCellVM)
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "LoadingCellID", for: indexPath) as! LoadingCell
+            cell.spinner.startAnimating()
             return cell
         }
-        cell.titleLabel.text = article.content
-        return cell
     }
 
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
 
-        return viewModel.titleForHeaderAt(section: section)
+        if (offsetY > contentHeight - scrollView.frame.height * 4) && !viewModel.isLoading {
+            viewModel.fetchArticles()
+        }
     }
-
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-
-        return UITableView.automaticDimension
-    }
-
 }
 
 extension ArticleListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: false)
     }
 }

@@ -11,6 +11,7 @@ import CoreData
 
 protocol UIUpdaterProtocol: class {
     func updateUI()
+    func updateOfflineUI(error: Error)
 }
 
 class ArticleListViewModel: NSObject {
@@ -23,6 +24,14 @@ class ArticleListViewModel: NSObject {
 
     var title = "Articles"
     var coordinator: ArticleListCoordinator?
+    var currentPage: Int = 0
+    var isLoading: Bool {
+        !(fetchSession?.progress.isFinished ?? true)
+    }
+
+    enum Cell {
+        case article(ArticleCellViewModel)
+    }
 
     lazy var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult> = {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "CDArticle")
@@ -51,21 +60,21 @@ class ArticleListViewModel: NSObject {
             return
         }
 
-        let queryModel = CommonAPIQuery(page: 1, limit: 10)
+        let queryModel = CommonAPIQuery(page: currentPage + 1, limit: 10)
         fetchSession = articleNetworkService.getAllArticles(apiQueryModel: queryModel, completion: { [weak self] (response) in
 
             self?.fetchSession = nil
-
-            switch response {
-            case .success(let articleList):
-                print(articleList)
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                switch response {
+                case .success(let articleList):
                     self?.coreDataManager.prepare(dataForSaving: articleList)
                     self?.uiUpdater?.updateUI()
-                }
+                    self?.currentPage += 1
 
-            case .failure(let error):
-                print(error)
+                case .failure(let error):
+                    self?.uiUpdater?.updateOfflineUI(error: error)
+                    print(error)
+                }
             }
         })
 
@@ -102,21 +111,24 @@ extension ArticleListViewModel: DataStoreProtocol{
         return sectionInfo.numberOfObjects
     }
 
-    func titleForHeaderAt(section: Int) -> String{
+    func titleForHeaderAt(section: Int) -> String {
 
         guard let sectionInfo = self.fetchedResultsController.sections?[section] else { return "" }
         return sectionInfo.name
     }
 
-    func itemAt(indexPath: IndexPath) -> Article? {
-        guard let item = self.fetchedResultsController.object(at: indexPath) as? CDArticle else{
+    func itemAt(indexPath: IndexPath) -> ArticleCellViewModel? {
+        guard let item = self.fetchedResultsController.object(at: IndexPath(row: 0, section: indexPath.row)) as? CDArticle else{
             return nil
         }
-        return createArticleViewModelWith(item)
+        if let article = createArticleViewModelWith(item) {
+            return ArticleCellViewModel(article)
+        }
+        return nil
     }
 
     private func createArticleViewModelWith(_ item: CDArticle) -> Article? {
 
-        return Article(id: item.id!, createdAt: item.createdAt!, content: item.content!, comments: item.comments, likes: item.likes, media: item.convertToMediaList() ?? [], user: item.convertToUserList() ?? [])
+        return Article(id: "\(item.id)", createdAt: item.createdAt!, content: item.content!, comments: item.comments, likes: item.likes, media: item.convertToMediaList() ?? [], user: item.convertToUserList() ?? [])
        }
 }

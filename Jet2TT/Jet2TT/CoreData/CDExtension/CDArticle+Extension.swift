@@ -11,7 +11,7 @@ import Foundation
 extension CDArticle {
 
     func convertToArticle() -> Article {
-        return Article(id: self.id!, createdAt: self.createdAt!, content: self.content!, comments: self.comments, likes: self.likes, media: self.convertToMediaList() ?? [], user: self.convertToUserList() ?? [])
+        return Article(id: "\(self.id)", createdAt: self.createdAt!, content: self.content!, comments: self.comments, likes: self.likes, media: self.convertToMediaList() ?? [], user: self.convertToUserList() ?? [])
     }
 
     func convertToMediaList() -> [Media]? {
