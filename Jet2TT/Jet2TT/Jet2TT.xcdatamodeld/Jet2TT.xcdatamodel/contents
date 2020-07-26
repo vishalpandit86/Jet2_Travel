@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15508" systemVersion="19A558d" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CDArticle" representedClassName="CDArticle" syncable="YES">
+        <attribute name="comments" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="content" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="likes" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="toMedia" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDMedia" inverseName="toArticle" inverseEntity="CDMedia"/>
+        <relationship name="toUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDUser" inverseName="toArticle" inverseEntity="CDUser"/>
+    </entity>
+    <entity name="CDMedia" representedClassName="CDMedia" syncable="YES">
+        <attribute name="blogId" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="image" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+        <relationship name="toArticle" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDArticle" inverseName="toMedia" inverseEntity="CDArticle"/>
+    </entity>
+    <entity name="CDUser" representedClassName="CDUser" syncable="YES">
+        <attribute name="about" optional="YES" attributeType="String"/>
+        <attribute name="avatar" optional="YES" attributeType="String"/>
+        <attribute name="blogId" optional="YES" attributeType="String"/>
+        <attribute name="city" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="String"/>
+        <attribute name="designation" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="lastname" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="toArticle" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDArticle" inverseName="toUser" inverseEntity="CDArticle"/>
+    </entity>
+    <elements>
+        <element name="CDArticle" positionX="-63" positionY="-18" width="128" height="148"/>
+        <element name="CDMedia" positionX="-54" positionY="27" width="128" height="148"/>
+        <element name="CDUser" positionX="-36" positionY="72" width="128" height="193"/>
+    </elements>
+</model>
