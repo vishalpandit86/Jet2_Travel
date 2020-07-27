@@ -12,8 +12,6 @@ import UIKit
 struct ArticleCellViewModel {
     private let article: Article
 
-    static let imageCache = NSCache<NSString, UIImage>()
-
     enum CacheKey {
         case avatar
         case media

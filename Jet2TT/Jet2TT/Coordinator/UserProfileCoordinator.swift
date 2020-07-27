@@ -13,7 +13,7 @@ final class UserProfileCoordinator: Coordinator {
     private(set) var childCoordinators: [Coordinator] = []
 
     private let navigationController: UINavigationController
-    var parentCoordinator: ArticleListCoordinator?
+    var parentCoordinator: Coordinator?
 
     private let user: User!
 

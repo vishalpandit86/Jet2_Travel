@@ -52,5 +52,35 @@
             </objects>
             <point key="canvasLocation" x="818" y="134"/>
         </scene>
+        <!--Users View Controller-->
+        <scene sceneID="k30-Zh-hYR">
+            <objects>
+                <viewController storyboardIdentifier="UsersViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="r1V-zI-Whd" customClass="UsersViewController" customModule="Jet2TT" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Y09-AR-WMd">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="lGb-iR-kL9">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="862"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="Khb-Bx-G32" firstAttribute="bottom" secondItem="lGb-iR-kL9" secondAttribute="bottom" id="bRO-hG-8bC"/>
+                            <constraint firstItem="lGb-iR-kL9" firstAttribute="top" secondItem="Y09-AR-WMd" secondAttribute="top" id="fQB-Sw-T65"/>
+                            <constraint firstItem="lGb-iR-kL9" firstAttribute="leading" secondItem="Khb-Bx-G32" secondAttribute="leading" id="hfK-JA-Raz"/>
+                            <constraint firstItem="Khb-Bx-G32" firstAttribute="trailing" secondItem="lGb-iR-kL9" secondAttribute="trailing" id="sAg-mf-Bpw"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Khb-Bx-G32"/>
+                    </view>
+                    <connections>
+                        <outlet property="userTableView" destination="lGb-iR-kL9" id="Whd-LY-t6K"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="acY-9b-cka" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1463" y="132"/>
+        </scene>
     </scenes>
 </document>

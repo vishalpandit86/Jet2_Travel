@@ -26,6 +26,28 @@ final class CoreDataManager {
         persistentContainer.viewContext
     }
 
+    func prepare(dataForSaving: [User]) {
+
+        _ = dataForSaving.map({createEntityFrom(data: $0)})
+
+        save()
+    }
+
+    private func createEntityFrom(data: User) -> CDUser? {
+        let user = CDUser(context: moc)
+        user.id = data.id
+        user.blogId = data.blogId ?? ""
+        user.createdAt = data.createdAt
+        user.name = data.name
+        user.avatar = data.avatar
+        user.lastname = data.lastname
+        user.designation = data.designation
+        user.about = data.about
+        user.city = data.city
+
+        return user
+    }
+
     func prepare(dataForSaving: [Article]) {
 
         _ = dataForSaving.map({createEntityFrom(data: $0)})

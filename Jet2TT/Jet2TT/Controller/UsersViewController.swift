@@ -1,20 +1,22 @@
 //
-//  ArticleListViewController.swift
+//  UsersViewController.swift
 //  Jet2TT
 //
-//  Created by Vishal Pandit on 26/07/20.
+//  Created by Vishal Pandit on 27/07/20.
 //  Copyright © 2020 Vishal. All rights reserved.
 //
+
 
 import UIKit
 import CoreData
 
-class ArticleListViewController: UIViewController, UIUpdaterProtocol {
-    var viewModel: ArticleListViewModel!
-    @IBOutlet weak var articleTableView: UITableView!
+final class UsersViewController: UIViewController, UIUpdaterProtocol {
+    var viewModel: UsersViewModel!
+    @IBOutlet weak var userTableView: UITableView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         setupViews()
         updateUI()
         viewModel.viewDidLoad()
@@ -23,41 +25,36 @@ class ArticleListViewController: UIViewController, UIUpdaterProtocol {
     private func setupViews() {
         navigationItem.title = viewModel.title
 
-        articleTableView.dataSource = self
-        articleTableView.delegate = self
+        userTableView.dataSource = self
+        userTableView.delegate = self
 
-        articleTableView.rowHeight = UITableView.automaticDimension
-        articleTableView.estimatedRowHeight = 600
+        userTableView.rowHeight = UITableView.automaticDimension
+        userTableView.estimatedRowHeight = 60
 
         viewModel.fetchedResultsController.delegate = self
-        articleTableView.register(ArticleCell.self, forCellReuseIdentifier: "ArticleCellID")
-        articleTableView.register(LoadingCell.self, forCellReuseIdentifier: "LoadingCellID")
 
-        let allUsersBarButtonItem = UIBarButtonItem(title: "Users", style: .done, target: self, action: #selector(showAllUsers))
-        self.navigationItem.rightBarButtonItem  = allUsersBarButtonItem
+        userTableView.register(UserCell.self, forCellReuseIdentifier: "UserCellID")
+        userTableView.register(LoadingCell.self, forCellReuseIdentifier: "LoadingCellID")
+
     }
 
     func updateUI() {
         viewModel.getDataFromDB()
-        articleTableView.reloadData()
+        userTableView.reloadData()
     }
 
     func updateOfflineUI(error: Error) {
         viewModel.getDataFromDB()
-        articleTableView.reloadData()
+        userTableView.reloadData()
 
         showMessage(title: "Offline", message: error.localizedDescription, actionTitle: NSLocalizedString("OK", comment: ""))
     }
 
-    @objc
-    func showAllUsers() {
-        viewModel.showAllUsers()
-    }
 }
 
-extension ArticleListViewController: NSFetchedResultsControllerDelegate {
+extension UsersViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        articleTableView.beginUpdates()
+        userTableView.beginUpdates()
     }
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -65,25 +62,25 @@ extension ArticleListViewController: NSFetchedResultsControllerDelegate {
         switch (type) {
         case .update:
             if let newIndexPath = newIndexPath {
-                if articleTableView.indexPathsForVisibleRows?.firstIndex(of: newIndexPath) != nil {
-                    if let cell = articleTableView.cellForRow(at: newIndexPath) as? ArticleCell, let articleCellVM = viewModel.itemAt(indexPath: newIndexPath) {
-                        cell.update(with: articleCellVM)
+                if userTableView.indexPathsForVisibleRows?.firstIndex(of: newIndexPath) != nil {
+                    if let cell = userTableView.cellForRow(at: newIndexPath) as? UserCell, let cellVM = viewModel.itemAt(indexPath: newIndexPath) {
+                        cell.update(with: cellVM)
                     }
                 }
             }
         case .insert:
             if let newIndexPath = newIndexPath {
-                articleTableView.insertRows(at: [IndexPath(row: newIndexPath.section, section: 0)], with: .none)
+                userTableView.insertRows(at: [IndexPath(row: newIndexPath.section, section: 0)], with: .none)
             }
         case .move:
             if let indexPath = indexPath, let newIndexPath = newIndexPath {
                 if indexPath == newIndexPath {
-                    if let cell = articleTableView.cellForRow(at: newIndexPath) as? ArticleCell, let articleCellVM = viewModel.itemAt(indexPath: newIndexPath) {
-                        cell.update(with: articleCellVM)
+                    if let cell = userTableView.cellForRow(at: newIndexPath) as? UserCell, let cellVM = viewModel.itemAt(indexPath: newIndexPath) {
+                        cell.update(with: cellVM)
                     }
                 } else {
-                    articleTableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 0)], with: .none)
-                    articleTableView.insertRows(at: [IndexPath(row: newIndexPath.row, section: 0)], with: .none)
+                    userTableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 0)], with: .none)
+                    userTableView.insertRows(at: [IndexPath(row: newIndexPath.row, section: 0)], with: .none)
                 }
             }
         default:
@@ -93,11 +90,11 @@ extension ArticleListViewController: NSFetchedResultsControllerDelegate {
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        articleTableView.endUpdates()
+        userTableView.endUpdates()
     }
 }
 
-extension ArticleListViewController: UITableViewDataSource {
+extension UsersViewController: UITableViewDataSource {
 
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
@@ -107,23 +104,21 @@ extension ArticleListViewController: UITableViewDataSource {
         if section == 0 {
             return viewModel.allObjectCount()
         } else if section == 1 {
-            //Return the Loading cell
             return 1
         } else {
-            //Return nothing
             return 0
         }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ArticleCellID", for: indexPath) as! ArticleCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "UserCellID", for: indexPath) as! UserCell
 
-            guard let articleCellVM = viewModel.itemAt(indexPath: indexPath) else {
+            guard let cellVM = viewModel.itemAt(indexPath: indexPath) else {
                 return cell
             }
 
-            cell.update(with: articleCellVM)
+            cell.update(with: cellVM)
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "LoadingCellID", for: indexPath) as! LoadingCell
@@ -132,19 +127,23 @@ extension ArticleListViewController: UITableViewDataSource {
         }
     }
 
-    /// check for scroll reaches at end of table view
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
 
         if (offsetY > contentHeight - scrollView.frame.height * 4) && !viewModel.isLoading {
-            viewModel.fetchArticles()
+            viewModel.fetchUsers()
         }
     }
 }
 
-extension ArticleListViewController: UITableViewDelegate {
+extension UsersViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
+        guard let cellVM = viewModel.itemAt(indexPath: indexPath) else {
+            return
+        }
+
+        cellVM.onUserSelect(cellVM.user)
     }
 }

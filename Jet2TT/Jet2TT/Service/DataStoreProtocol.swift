@@ -11,6 +11,6 @@ import Foundation
 protocol DataStoreProtocol {
 
     associatedtype T
-    func rowsCount(for section:Int) -> Int
+    func allObjectCount() -> Int
     func itemAt(indexPath: IndexPath) -> T?
 }
