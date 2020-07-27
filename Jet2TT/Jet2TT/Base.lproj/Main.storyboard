@@ -37,5 +37,20 @@
             </objects>
             <point key="canvasLocation" x="139" y="138"/>
         </scene>
+        <!--User Profile Controller-->
+        <scene sceneID="FtG-1c-AU6">
+            <objects>
+                <viewController storyboardIdentifier="UserProfileController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="NL9-B7-U6b" customClass="UserProfileController" customModule="Jet2TT" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="fMS-Aa-eRn">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="gtJ-C9-gkP"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xOJ-rW-iJz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="818" y="134"/>
+        </scene>
     </scenes>
 </document>

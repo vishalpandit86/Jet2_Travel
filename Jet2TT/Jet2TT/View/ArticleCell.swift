@@ -19,6 +19,9 @@ class ArticleCell: UITableViewCell {
     let likeLabel = UILabel()
     let commentsLabel = UILabel()
 
+    var userTapGestureRecognizer: UITapGestureRecognizer!
+    var cellViewModel: ArticleCellViewModel?
+
     required init?(coder aDecoder: NSCoder) {
            fatalError("init(coder:) has not been implemented")
        }
@@ -43,12 +46,12 @@ class ArticleCell: UITableViewCell {
         [userAvatarImageView, userNameLabel, designationLabel, createAtLabel, mediaImageView, contentLabel, likeLabel, commentsLabel].forEach({$0.translatesAutoresizingMaskIntoConstraints = false})
 
         contentLabel.numberOfLines = 0
-        userNameLabel.font = .systemFont(ofSize: 16.0)
-        designationLabel.font = .systemFont(ofSize: 13.0)
-        createAtLabel.font = .systemFont(ofSize: 12.0)
-        contentLabel.font = .systemFont(ofSize: 14.0)
-        likeLabel.font = .boldSystemFont(ofSize: 12.0)
-        commentsLabel.font = .boldSystemFont(ofSize: 12.0)
+        userNameLabel.font = .systemFont(ofSize: 16, weight: .bold)
+        designationLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        createAtLabel.font = .systemFont(ofSize: 12, weight: .light)
+        contentLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        likeLabel.font = .systemFont(ofSize: 14, weight: .bold)
+        commentsLabel.font = .systemFont(ofSize: 14, weight: .bold)
 
         createAtLabel.textAlignment = .right
         commentsLabel.textAlignment = .right
@@ -60,6 +63,13 @@ class ArticleCell: UITableViewCell {
 
         mediaImageView.contentMode = .scaleAspectFit
 
+        userTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(userViewTapped))
+
+        [userNameLabel, designationLabel, userAvatarImageView].forEach({ view in
+            let tapGesture  = UITapGestureRecognizer(target: self, action: #selector(userViewTapped))
+            view.addGestureRecognizer(tapGesture)
+            view.isUserInteractionEnabled = true
+        })
     }
 
     private func setupHierarchy() {
@@ -113,22 +123,23 @@ class ArticleCell: UITableViewCell {
         ])
 
         NSLayoutConstraint.activate([
-            likeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0.0),
+            likeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -3.0),
             likeLabel.leftAnchor.constraint(equalTo: marginGuide.leftAnchor, constant: 5.0),
             likeLabel.heightAnchor.constraint(equalToConstant: 20.0),
-            likeLabel.widthAnchor.constraint(equalToConstant: 120.0)
+            likeLabel.widthAnchor.constraint(equalToConstant: 140.0)
         ])
 
         NSLayoutConstraint.activate([
-            commentsLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0.0),
+            commentsLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -3.0),
             commentsLabel.rightAnchor.constraint(equalTo: marginGuide.rightAnchor, constant: 0.0),
             commentsLabel.heightAnchor.constraint(equalToConstant: 20.0),
-            commentsLabel.widthAnchor.constraint(equalToConstant: 120.0)
+            commentsLabel.widthAnchor.constraint(equalToConstant: 140.0)
         ])
 
     }
 
     func update(with viewModel: ArticleCellViewModel) {
+        self.cellViewModel = viewModel
         userNameLabel.text = viewModel.userName
         designationLabel.text = viewModel.designation
         createAtLabel.text = viewModel.createAtString
@@ -149,12 +160,19 @@ class ArticleCell: UITableViewCell {
             self.userAvatarImageView.layer.shadowOffset = CGSize(width: 5.0, height: 5.0)
             self.userAvatarImageView.layer.shadowRadius = 22.0
             self.userAvatarImageView.layer.shadowOpacity = 0.9
+
+            self.userAvatarImageView.addGestureRecognizer(self.userTapGestureRecognizer)
+            self.userAvatarImageView.isUserInteractionEnabled = true
         }
 
         if viewModel.isMediaAvailable {
             viewModel.loadImage(cacheKey: .media) { (image) in
                 guard image != nil else { return }
                 self.mediaImageView.image = image
+
+                NSLayoutConstraint.activate([
+                    self.mediaImageView.heightAnchor.constraint(equalToConstant: 160.0)
+                ])
             }
         } else {
             NSLayoutConstraint.activate([
@@ -162,5 +180,19 @@ class ArticleCell: UITableViewCell {
             ])
         }
 
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.cellViewModel = nil
+        self.userAvatarImageView.image = nil
+        self.mediaImageView.image = nil
+    }
+
+    @objc
+    func userViewTapped(_ sender: UITapGestureRecognizer) {
+        if let user = self.cellViewModel?.user {
+            self.cellViewModel?.onUserSelect(user)
+        }
     }
 }

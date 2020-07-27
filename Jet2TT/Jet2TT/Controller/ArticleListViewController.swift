@@ -16,6 +16,7 @@ class ArticleListViewController: UIViewController, UIUpdaterProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
+        updateUI()
         viewModel.viewDidLoad()
     }
 
@@ -51,16 +52,43 @@ extension ArticleListViewController: NSFetchedResultsControllerDelegate {
         articleTableView.beginUpdates()
     }
 
+//    public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
+//        switch type {
+//        case .insert:
+//            articleTableView.insertSections(IndexSet(integer: 0), with: .none)
+//        case .delete:
+//            articleTableView.deleteSections(IndexSet(integer: 0), with: .none)
+//        case .move, .update:
+//            articleTableView.reloadSections(IndexSet(integer: 0), with: .none)
+//        @unknown default:
+//            fatalError("Unknown NSFetchedResultsChangeType not implemented")
+//        }
+//    }
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
         switch (type) {
-        case .insert:
-            if let indexPath = newIndexPath {
-                articleTableView.insertRows(at: [IndexPath(row: indexPath.section, section: 0)], with: .none)
+        case .update:
+            if let newIndexPath = newIndexPath {
+                if articleTableView.indexPathsForVisibleRows?.firstIndex(of: newIndexPath) != nil {
+                    if let cell = articleTableView.cellForRow(at: newIndexPath) as? ArticleCell, let articleCellVM = viewModel.itemAt(indexPath: newIndexPath) {
+                        cell.update(with: articleCellVM)
+                    }
+                }
             }
-        case .delete:
-            if let indexPath = indexPath {
-                articleTableView.deleteRows(at: [IndexPath(row: indexPath.section, section: 0)], with: .none)
+        case .insert:
+            if let newIndexPath = newIndexPath {
+                articleTableView.insertRows(at: [IndexPath(row: newIndexPath.section, section: 0)], with: .none)
+            }
+        case .move:
+            if let indexPath = indexPath, let newIndexPath = newIndexPath {
+                if indexPath == newIndexPath {
+                    if let cell = articleTableView.cellForRow(at: newIndexPath) as? ArticleCell, let articleCellVM = viewModel.itemAt(indexPath: newIndexPath) {
+                        cell.update(with: articleCellVM)
+                    }
+                } else {
+                    articleTableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 0)], with: .none)
+                    articleTableView.insertRows(at: [IndexPath(row: newIndexPath.row, section: 0)], with: .none)
+                }
             }
         default:
             break
@@ -81,7 +109,7 @@ extension ArticleListViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return viewModel.sectionCount()
+            return viewModel.allObjectCount()
         } else if section == 1 {
             //Return the Loading cell
             return 1

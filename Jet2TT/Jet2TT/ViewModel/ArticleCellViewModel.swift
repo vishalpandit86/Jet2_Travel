@@ -14,23 +14,12 @@ struct ArticleCellViewModel {
 
     static let imageCache = NSCache<NSString, UIImage>()
 
-    private var avatarCacheKey: String {
-        article.user.first!.avatar
-    }
-
-    private var mediaCacheKey: String {
-        if let key = article.media.first?.id {
-            return key
-        }
-        return UUID().uuidString
-    }
-
     enum CacheKey {
         case avatar
         case media
     }
 
-    private let imageQueue = DispatchQueue(label: "imageQueue", qos: .background)
+    var onUserSelect: (User) -> Void = { _ in }
 
     static var formatter: RelativeDateTimeFormatter = {
         let formatter = RelativeDateTimeFormatter()
@@ -60,15 +49,18 @@ struct ArticleCellViewModel {
     }
 
     var comments: String {
-        "\(article.comments) Comments"
+        "\(article.comments.formatUsingAbbreviation()) Comments"
     }
 
     var likes: String {
-        "\(article.likes) Likes"
+        "\(article.likes.formatUsingAbbreviation()) Likes"
     }
 
     var userName: String? {
-        article.user.first?.name
+        if let fName = article.user.first?.name, let lName = article.user.first?.lastname {
+            return "\(fName) \(lName)"
+        }
+        return nil
     }
 
     var designation: String? {
@@ -81,37 +73,16 @@ struct ArticleCellViewModel {
         }
         return false
     }
-    func loadImage(cacheKey: CacheKey, completion: @escaping (UIImage?) -> Void) {
-        // check cache 1st
-        let key = cacheKey == .media ? mediaCacheKey : avatarCacheKey
 
-        if let image = Self.imageCache.object(forKey: key as NSString) {
-            DispatchQueue.main.async {
-                completion(image)
-            }
-        } else {
-            imageQueue.async {
-                let url = cacheKey == .media ? URL(string: self.article.media.first!.image) : URL(string: self.article.user.first!.avatar)
-                URLSession.shared.dataTask(with: url! as URL, completionHandler: { (data, response, error) -> Void in
-
-                    if error != nil {
-                        print(error ?? "error")
-                        completion(nil)
-                        return
-                    }
-                    DispatchQueue.main.async(execute: { () -> Void in
-                        if let image = UIImage(data: data!) {
-                            Self.imageCache.setObject(image, forKey: key as NSString)
-                            DispatchQueue.main.async {
-                                completion(image)
-                            }
-                        }
-                    })
-
-                }).resume()
-
-            }
-
+    var user: User? {
+        if let user = article.user.first {
+            return user
         }
+        return nil
+    }
+
+    func loadImage(cacheKey: CacheKey, completion: @escaping (UIImage?) -> Void) {
+        let urlString = cacheKey == .media ? self.article.media.first!.image :  self.article.user.first!.avatar
+        ImageCacheManager.loadImage(urlString, completion: completion)
     }
 }

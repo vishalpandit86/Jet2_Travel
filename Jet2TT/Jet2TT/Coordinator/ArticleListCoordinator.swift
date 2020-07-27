@@ -20,13 +20,10 @@ final class ArticleListCoordinator: Coordinator {
 
     func start() {
         let articleListVC : ArticleListViewController = .instantiate()
-        articleListVC.viewModel = ArticleListViewModel(with: ArticleRequests(), uiUpdater: articleListVC)
-        // set VM and then navigate
+        let viewModel = ArticleListViewModel(with: ArticleRequests(), uiUpdater: articleListVC)
+        viewModel.coordinator = self
+        articleListVC.viewModel = viewModel
         navigationController.setViewControllers([articleListVC], animated: false)
-    }
-
-    func startShowUserProfile() {
-
     }
 
     func childDidFinish(_ childCoordinator: Coordinator) {
@@ -36,5 +33,12 @@ final class ArticleListCoordinator: Coordinator {
         }) {
             childCoordinators.remove(at: index)
         }
+    }
+
+    func onUserSelect(_ user: User) {
+        let coordinator = UserProfileCoordinator(navigationController: navigationController, user: user)
+        coordinator.parentCoordinator = self
+        childCoordinators.append(coordinator)
+        coordinator.start()
     }
 }

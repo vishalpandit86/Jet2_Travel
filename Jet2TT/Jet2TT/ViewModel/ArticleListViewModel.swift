@@ -23,14 +23,12 @@ class ArticleListViewModel: NSObject {
     private var fetchSession: URLSessionDataTask?
 
     var title = "Articles"
-    var coordinator: ArticleListCoordinator?
+    weak var coordinator: ArticleListCoordinator?
+
     var currentPage: Int = 0
+
     var isLoading: Bool {
         !(fetchSession?.progress.isFinished ?? true)
-    }
-
-    enum Cell {
-        case article(ArticleCellViewModel)
     }
 
     lazy var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult> = {
@@ -60,6 +58,9 @@ class ArticleListViewModel: NSObject {
             return
         }
 
+        let count = allObjectCount()
+        currentPage = (count / 10)
+
         let queryModel = CommonAPIQuery(page: currentPage + 1, limit: 10)
         fetchSession = articleNetworkService.getAllArticles(apiQueryModel: queryModel, completion: { [weak self] (response) in
 
@@ -69,7 +70,6 @@ class ArticleListViewModel: NSObject {
                 case .success(let articleList):
                     self?.coreDataManager.prepare(dataForSaving: articleList)
                     self?.uiUpdater?.updateUI()
-                    self?.currentPage += 1
 
                 case .failure(let error):
                     self?.uiUpdater?.updateOfflineUI(error: error)
@@ -93,15 +93,19 @@ class ArticleListViewModel: NSObject {
 
 extension ArticleListViewModel: DataStoreProtocol{
 
+    func allObjectCount() -> Int {
+        guard let allObjects = fetchedResultsController.fetchedObjects else { return 0 }
+        return allObjects.count
+    }
 
-    func sectionCount() ->Int{
+    func sectionCount() -> Int{
         guard let sections = self.fetchedResultsController.sections else {
             return 0
         }
         return sections.count
     }
 
-    func rowsCount(for section:Int) -> Int{
+    func rowsCount(for section:Int) -> Int {
 
         guard let sections = self.fetchedResultsController.sections else {
             return 0
@@ -118,11 +122,14 @@ extension ArticleListViewModel: DataStoreProtocol{
     }
 
     func itemAt(indexPath: IndexPath) -> ArticleCellViewModel? {
-        guard let item = self.fetchedResultsController.object(at: IndexPath(row: 0, section: indexPath.row)) as? CDArticle else{
+        guard let item = self.fetchedResultsController.object(at: IndexPath(row: 0, section: indexPath.row)) as? CDArticle else {
             return nil
         }
-        if let article = createArticleViewModelWith(item) {
-            return ArticleCellViewModel(article)
+        if let article = createArticleViewModelWith(item),
+            let coordinator = coordinator {
+            var cellModel = ArticleCellViewModel(article)
+            cellModel.onUserSelect = coordinator.onUserSelect
+            return cellModel
         }
         return nil
     }
