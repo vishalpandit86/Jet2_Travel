@@ -28,7 +28,6 @@ struct UsersRequests: UsersServiceRequestType {
                         completion(.failure(error))
                         return
                     }
-
                     if let userList = userList {
                         completion(.success(userList))
                     }
@@ -36,7 +35,6 @@ struct UsersRequests: UsersServiceRequestType {
             case .failure(let error):
                 completion(.failure(error))
             }
-
         }
     }
 }

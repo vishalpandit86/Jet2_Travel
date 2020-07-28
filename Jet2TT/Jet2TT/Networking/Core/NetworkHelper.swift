@@ -37,20 +37,16 @@ struct NetworkHelper {
                 print(error.localizedDescription)
             }
         }
-
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
                 completion(.failure(error ?? NetworkError.unknown))
                 return
             }
-
             if let httpStatus = response as? HTTPURLResponse,  ![200, 201].contains(httpStatus.statusCode) {
                 completion(.failure(NetworkError.incorrectData(data)))
             }
             completion(.success(data))
-
         }
-
         task.resume()
         return task
     }

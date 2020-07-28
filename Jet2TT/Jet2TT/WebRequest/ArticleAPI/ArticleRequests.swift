@@ -28,7 +28,6 @@ struct ArticleRequests: ArticleServiceRequestType {
                         completion(.failure(error))
                         return
                     }
-
                     if let articleList = articleList {
                         completion(.success(articleList))
                     }
@@ -36,7 +35,6 @@ struct ArticleRequests: ArticleServiceRequestType {
             case .failure(let error):
                 completion(.failure(error))
             }
-
         }
     }
 }

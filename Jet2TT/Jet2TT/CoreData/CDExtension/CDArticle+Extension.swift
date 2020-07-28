@@ -36,7 +36,5 @@ extension CDArticle {
         })
 
         return userList
-
-
     }
 }

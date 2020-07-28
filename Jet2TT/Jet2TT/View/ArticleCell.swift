@@ -173,7 +173,7 @@ class ArticleCell: UITableViewCell {
             viewModel.loadImage(cacheKey: .media) { (image) in
                 guard image != nil else { return }
                 self.mediaImageView.image = image
-                self.mediaHeightConstraint.constant = 120.0
+                self.mediaHeightConstraint.constant = 160.0
 
                 self.contentView.setNeedsLayout()
                 self.contentView.layoutIfNeeded()

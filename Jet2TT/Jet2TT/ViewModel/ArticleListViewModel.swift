@@ -81,13 +81,11 @@ class ArticleListViewModel: NSObject {
     }
 
     func getDataFromDB() {
-
         do {
             try fetchedResultsController.performFetch()
         } catch(let ex) {
             print(ex.localizedDescription)
         }
-
     }
 
     func showAllUsers() {

@@ -38,12 +38,8 @@ final class ImageCacheManager {
                             }
                         }
                     })
-
                 }).resume()
-
             }
-
         }
     }
-    
 }

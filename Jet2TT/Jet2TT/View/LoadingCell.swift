@@ -44,9 +44,10 @@ class LoadingCell: UITableViewCell {
     }
 
     private func setupLayouts() {
+        let marginGuide = contentView.layoutMarginsGuide
         NSLayoutConstraint.activate([
-            spinner.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            spinner.centerXAnchor.constraint(equalTo: marginGuide.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: marginGuide.centerYAnchor),
             spinner.widthAnchor.constraint(equalToConstant: 44.0),
             spinner.heightAnchor.constraint(equalToConstant: 44.0)
         ])

@@ -27,9 +27,7 @@ final class CoreDataManager {
     }
 
     func prepare(dataForSaving: [User]) {
-
         _ = dataForSaving.map({createEntityFrom(data: $0)})
-
         save()
     }
 
@@ -49,9 +47,7 @@ final class CoreDataManager {
     }
 
     func prepare(dataForSaving: [Article]) {
-
         _ = dataForSaving.map({createEntityFrom(data: $0)})
-
         save()
     }
 
@@ -76,7 +72,6 @@ final class CoreDataManager {
                 mediaSet.update(with: media)
             }
             article.addToToMedia(mediaSet)
-
 
             var userSet: Set<CDUser> = []
             for userItem in data.user {
@@ -104,37 +99,4 @@ final class CoreDataManager {
             print(error)
         }
     }
-
-    func saveDataInBackground() {
-        persistentContainer.performBackgroundTask { (context) in
-
-            if context.hasChanges {
-                do {
-                    try context.save()
-                } catch {
-                    let nserror = error as NSError
-                    fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-                }
-            }
-        }
-    }
-    func get<T: NSManagedObject>(_ id: NSManagedObjectID) -> T? {
-        do {
-            return try moc.existingObject(with: id) as? T
-        } catch {
-            print(error)
-        }
-        return nil
-    }
-
-    func getAll<T: NSManagedObject>() -> [T] {
-        do {
-            let fetchReq = NSFetchRequest<T>(entityName: "\(T.self)")
-            return try moc.fetch(fetchReq)
-        } catch {
-            print(error)
-            return []
-        }
-    }
-
 }
