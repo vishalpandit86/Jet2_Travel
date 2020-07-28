@@ -22,6 +22,8 @@ class ArticleCell: UITableViewCell {
     var userTapGestureRecognizer: UITapGestureRecognizer!
     var cellViewModel: ArticleCellViewModel?
 
+    var mediaHeightConstraint: NSLayoutConstraint!
+
     required init?(coder aDecoder: NSCoder) {
            fatalError("init(coder:) has not been implemented")
        }
@@ -111,9 +113,10 @@ class ArticleCell: UITableViewCell {
         NSLayoutConstraint.activate([
             self.mediaImageView.topAnchor.constraint(equalTo: self.userAvatarImageView.bottomAnchor, constant: 5.0),
             self.mediaImageView.leftAnchor.constraint(equalTo: marginGuide.leftAnchor, constant: 5.0),
-            self.mediaImageView.rightAnchor.constraint(equalTo: marginGuide.rightAnchor, constant: 5.0),
-            self.mediaImageView.heightAnchor.constraint(equalToConstant: 160.0)
+            self.mediaImageView.rightAnchor.constraint(equalTo: marginGuide.rightAnchor, constant: 5.0)
         ])
+        mediaHeightConstraint = self.mediaImageView.heightAnchor.constraint(equalToConstant: 160.0)
+        mediaHeightConstraint.isActive = true
 
         NSLayoutConstraint.activate([
             contentLabel.topAnchor.constraint(equalTo: mediaImageView.bottomAnchor, constant: 5.0),
@@ -163,23 +166,26 @@ class ArticleCell: UITableViewCell {
 
             self.userAvatarImageView.addGestureRecognizer(self.userTapGestureRecognizer)
             self.userAvatarImageView.isUserInteractionEnabled = true
+
         }
 
         if viewModel.isMediaAvailable {
             viewModel.loadImage(cacheKey: .media) { (image) in
                 guard image != nil else { return }
                 self.mediaImageView.image = image
+                self.mediaHeightConstraint.constant = 120.0
 
-                NSLayoutConstraint.activate([
-                    self.mediaImageView.heightAnchor.constraint(equalToConstant: 160.0)
-                ])
+                self.contentView.setNeedsLayout()
+                self.contentView.layoutIfNeeded()
             }
         } else {
-            NSLayoutConstraint.activate([
-                self.mediaImageView.heightAnchor.constraint(equalToConstant: 0.0)
-            ])
+            self.mediaHeightConstraint.constant = 0.0
+            self.contentView.setNeedsLayout()
+            self.contentView.layoutIfNeeded()
         }
 
+        self.contentView.setNeedsLayout()
+        self.contentView.layoutIfNeeded()
     }
 
     override func prepareForReuse() {
